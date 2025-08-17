@@ -1,0 +1,112 @@
+----------------------------- CODE -----------------------------
+
+select tweet_id from Tweets
+where LENGTH(content) > 15;
+
+---------------------------------------------------------------
+
+
+---
+
+## 🔹 Problem Statement (no.1683)
+
+We have a table **Tweets**:
+
+| Column    | Type    | Meaning                  |
+| --------- | ------- | ------------------------ |
+| tweet\_id | int     | Unique id of the tweet   |
+| content   | varchar | Actual text of the tweet |
+
+👉 Rule: Twitter par ek tweet ki length **15 characters se zyada nahi honi chahiye**.
+👉 Tumhe un tweets ke **IDs** dikhane hain jo **invalid** hain (matlab jinki content length > 15 ho).
+
+---
+
+## 🔹 Tumhari Query
+
+```sql
+select tweet_id 
+from Tweets
+where LENGTH(content) > 15;
+```
+
+---
+
+## 🔹 Step-by-Step Explanation
+
+### 1. `select tweet_id`
+
+* Output mein sirf **tweet\_id column** chahiye.
+* Matlab tweet ka unique number hi show karna hai, content nahi.
+
+---
+
+### 2. `from Tweets`
+
+* Data uthana hai **Tweets table** se.
+
+---
+
+### 3. `where LENGTH(content) > 15`
+
+* **`LENGTH(content)`** → ye ek SQL function hai jo **string (content)** ke andar kitne characters hai wo count karta hai.
+
+  * Example: `LENGTH('Hello') = 5`
+  * Example: `LENGTH('I love SQL!') = 11`
+
+* Condition `> 15` ka matlab:
+  Sirf un rows ko include karo jinke content ki length **15 se zyada hai**.
+
+---
+
+## 🔹 Example Table
+
+Tweets:
+
+| tweet\_id | content                           |
+| --------- | --------------------------------- |
+| 1         | "Hello World"                     |
+| 2         | "LeetCode is Great"               |
+| 3         | "I love SQL"                      |
+| 4         | "This is very long tweet content" |
+
+---
+
+### Apply Condition
+
+* Tweet 1 → `"Hello World"` → length = 11 → ❌ not > 15
+* Tweet 2 → `"LeetCode is Great"` → length = 17 → ✅ include
+* Tweet 3 → `"I love SQL"` → length = 10 → ❌ not > 15
+* Tweet 4 → `"This is very long tweet content"` → length = 33 → ✅ include
+
+---
+
+### ✅ Final Output
+
+```
+tweet_id
+---------
+2
+4
+```
+
+---
+
+## 🔹 Easy Analogy
+
+Soch lo tum teacher ho aur students ko rule diya:
+
+* "Essay sirf **15 words tak likhna hai**."
+
+Ab tum copies check karte ho:
+
+* Jo student **15 words ya usse kam** likhe → valid.
+* Jo student **15 se zyada likhe** → invalid → tum uska roll number likh loge.
+
+👉 Bilkul wahi kaam SQL query kar rahi hai.
+
+---
+
+✅ Final matlab:
+**“Tweets table me se un tweet\_id ko dikhado jinke content ki length 15 characters se zyada hai.”**
+
