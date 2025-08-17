@@ -1,0 +1,89 @@
+--------------------- CODE ---------------------
+
+select product_id from Products  
+where low_fats='Y'AND recyclable='Y';
+
+
+------------------------------------------------------------------------------------
+
+👉 Find the **IDs of products** that are **both low fat and recyclable**.
+
+---
+
+### Table Information
+
+We are given a table named **Products** with these columns:
+
+| Column Name | Type |
+| ----------- | ---- |
+| product\_id | int  |
+| low\_fats   | enum |
+| recyclable  | enum |
+
+* `product_id` → the unique ID of the product.
+* `low_fats` → can be `'Y'` (Yes) or `'N'` (No).
+* `recyclable` → can also be `'Y'` (Yes) or `'N'` (No).
+
+---
+
+### The Query
+
+```sql
+select product_id 
+from Products  
+where low_fats = 'Y' 
+  and recyclable = 'Y';
+```
+
+---
+
+### Step-by-Step Explanation
+
+1. **`select product_id`**
+   → This means we only want the `product_id` column in our result, not all other details.
+
+2. **`from Products`**
+   → This tells SQL to look into the `Products` table.
+
+3. **`where low_fats = 'Y'`**
+   → This filters the rows to only those where the product is **low fat**.
+
+4. **`and recyclable = 'Y'`**
+   → This applies an additional filter.
+   Now the row must **also** be recyclable.
+
+5. **Final Output**
+   → We get only those `product_id`s where **both conditions are true**:
+
+   * Low fat = Yes
+   * Recyclable = Yes
+
+---
+
+### Example
+
+Suppose the table is:
+
+| product\_id | low\_fats | recyclable |
+| ----------- | --------- | ---------- |
+| 1           | Y         | N          |
+| 2           | Y         | Y          |
+| 3           | N         | Y          |
+| 4           | Y         | Y          |
+
+* Product 1 → ❌ not recyclable
+* Product 2 → ✅ low fat + recyclable
+* Product 3 → ❌ not low fat
+* Product 4 → ✅ low fat + recyclable
+
+✅ Final Result:
+
+```
+product_id
+-----------
+2
+4
+```
+
+---
+
