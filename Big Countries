@@ -1,0 +1,105 @@
+-------------------------- CODE ---------------------------
+
+select name,population,area from World
+where area >= 3000000 OR population >= 25000000;
+
+-----------------------------------------------------------
+
+
+## 🔹 Problem Statement (LeetCode 595 – Big Countries)
+
+Table: **World**
+
+| Column     | Type    | Meaning            |
+| ---------- | ------- | ------------------ |
+| name       | varchar | Country name       |
+| continent  | varchar | Which continent    |
+| area       | int     | Land area (in km²) |
+| population | int     | Population         |
+| gdp        | int     | GDP                |
+
+**Task:** Find the **name, population, and area** of all the **big countries**.
+A country is considered **big** if:
+
+* `area >= 3000000` (at least 3 million km²), **OR**
+* `population >= 25000000` (at least 25 million people).
+
+---
+
+## 🔹 Query Explanation
+
+```sql
+select name, population, area
+from World
+where area >= 3000000 OR population >= 25000000;
+```
+
+### Step by Step:
+
+1. **`select name, population, area`**
+   👉 Output mein sirf ye 3 columns dikhane hain.
+
+2. **`from World`**
+   👉 Data `World` table se lena hai.
+
+3. **`where area >= 3000000`**
+   👉 Countries jinka area **3 million km² ya usse zyada hai**.
+
+4. **`OR population >= 25000000`**
+   👉 Ya phir countries jinki population **25 million ya usse zyada hai**.
+   (Even if area chhota hai, but population bada hai, wo bhi include hoga).
+
+---
+
+## 🔹 Example
+
+Suppose table:
+
+| name      | area    | population |
+| --------- | ------- | ---------- |
+| India     | 3287263 | 1380004385 |
+| USA       | 9372610 | 331002651  |
+| Australia | 7692024 | 25687041   |
+| Nepal     | 147516  | 29136808   |
+| Bhutan    | 38394   | 771608     |
+
+Apply conditions:
+
+* India → population huge → ✅
+* USA → area + population huge → ✅
+* Australia → area >= 3M → ✅
+* Nepal → population >= 25M → ✅
+* Bhutan → neither → ❌
+
+👉 Final Output:
+
+```
+name       population   area
+India      1380004385   3287263
+USA        331002651    9372610
+Australia  25687041     7692024
+Nepal      29136808     147516
+```
+
+---
+
+## 🔹 Difference Between **at least** & **at most**
+
+* **At least (>=)** → minimum condition, **equal ya zyada allowed**.
+
+  * Example: "at least 10 chocolates" → 10, 11, 12 … sab chalega.
+
+* **At most (<=)** → maximum condition, **equal ya kam allowed**.
+
+  * Example: "at most 10 chocolates" → 10, 9, 8 … sab chalega, but 11 nahi.
+
+👉 In this problem:
+
+* `area >= 3000000` = **at least 3 million km² area**.
+* `population >= 25000000` = **at least 25 million log**.
+
+---
+
+✅ So, query ka simple matlab:
+**“Woh countries dikhado jinke paas minimum 3 million km² area hai ya minimum 25 million population hai.”**
+
