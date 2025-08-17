@@ -1,0 +1,140 @@
+------------------------- CODE -----------------------
+
+select distinct author_id AS id from Views 
+where author_id = viewer_id
+order by id asc;
+
+-----------------------------------------------------
+
+---
+
+## 🔹 Problem Statement (no.1148)
+
+We have a table **Views**:
+
+| Column      | Type | Meaning                   |
+| ----------- | ---- | ------------------------- |
+| article\_id | int  | Kaun sa article dekh gaya |
+| author\_id  | int  | Article kisne likha       |
+| viewer\_id  | int  | Kisne dekha               |
+| view\_date  | date | Kab dekha                 |
+
+**Task:**
+👉 Find the **IDs of all authors** who viewed their **own articles**.
+👉 Result unique (no duplicates), sorted ascending.
+
+---
+
+## 🔹 Tumhari Query
+
+```sql
+select distinct author_id as id
+from Views
+where author_id = viewer_id
+order by id asc;
+```
+
+---
+
+## 🔹 Step-by-Step Explanation
+
+### 1. `select distinct author_id as id`
+
+* **`author_id`** column select kar rahe ho.
+* **`as id`** → ek alias (temporary column name). Output mein column ka naam `id` dikhai dega.
+* **`distinct`** → duplicate values hata dega. Matlab agar ek hi author ne apna article bar-bar dekha ho, to sirf ek hi baar dikhai dega.
+
+---
+
+### 2. `from Views`
+
+👉 Data **Views** table se aa raha hai.
+
+---
+
+### 3. `where author_id = viewer_id`
+
+👉 Ye sabse important filter hai:
+
+* Matlab hum sirf un rows ko lenge jahan **author** aur **viewer same hai**.
+* Simple language: jinhone **apna hi article khud dekha**.
+
+---
+
+### 4. `order by id asc`
+
+👉 Final output ko **ascending order** (chhote se bada) mein arrange karega.
+
+---
+
+## 🔹 Example Table
+
+Views table:
+
+| article\_id | author\_id | viewer\_id | view\_date |
+| ----------- | ---------- | ---------- | ---------- |
+| 1           | 4          | 7          | 2019-01-01 |
+| 1           | 4          | 4          | 2019-01-01 |
+| 2           | 7          | 7          | 2019-01-01 |
+| 2           | 7          | 6          | 2019-01-01 |
+| 3           | 4          | 4          | 2019-01-02 |
+
+---
+
+### Apply Conditions
+
+1. **`where author_id = viewer_id`**
+   Rows left:
+
+   ```
+   | article_id | author_id | viewer_id |
+   |------------|-----------|-----------|
+   | 1          | 4         | 4         |
+   | 2          | 7         | 7         |
+   | 3          | 4         | 4         |
+   ```
+
+2. **`select distinct author_id as id`**
+   Now only `author_id`:
+
+   ```
+   4
+   7
+   4
+   ```
+
+   After `distinct`:
+
+   ```
+   4
+   7
+   ```
+
+3. **`order by id asc`**
+   Final sorted output:
+
+   ```
+   id
+   --
+   4
+   7
+   ```
+
+---
+
+## 🔹 Easy Analogy (Real life)
+
+Soch lo tumhare paas ek blogging website hai.
+
+* Har line batati hai ki **kisne kis article ko dekha**.
+* Tumhe sirf woh authors dhoondhne hain **jo apne hi article par jaake dekhte hain**.
+* Agar kisi author ne apna article **2-3 baar dekha** → tumhe sirf ek hi baar uska naam chahiye.
+* Aur result list sorted hona chahiye.
+
+---
+
+✅ So query ka simple matlab:
+**“Un unique authors ke IDs dikhado jinhone apna hi article dekha, ascending order mein.”**
+
+---
+
