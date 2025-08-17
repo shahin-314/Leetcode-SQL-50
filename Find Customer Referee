@@ -1,0 +1,117 @@
+-------------------- CODE ---------------
+
+select name from Customer
+where referee_id != 2 OR referee_id IS NULL;
+
+
+----------------------------------------
+
+
+
+## 🔹 Table Information
+
+Humare paas ek table hai: **Customer**
+
+| Column      | Meaning                                       |
+| ----------- | --------------------------------------------- |
+| id          | Customer ka unique ID                         |
+| name        | Customer ka naam                              |
+| referee\_id | Usko kisne refer kiya (jo customer usko laya) |
+
+👉 `referee_id` mein ya to ek number hota hai (jo kisi aur customer ka `id` hoga)
+👉 Ya phir `NULL` hota hai (matlab isko koi refer nahi kiya).
+
+---
+
+## 🔹 Query
+
+```sql
+select name 
+from Customer
+where referee_id != 2 OR referee_id IS NULL;
+```
+
+---
+
+## 🔹 Step by Step Breakdown
+
+### 1. `select name`
+
+* Matlab output mein **sirf name column** chahiye.
+* Dusre columns (`id`, `referee_id`) nahi.
+
+---
+
+### 2. `from Customer`
+
+* Data ko **Customer** table se lena hai.
+
+---
+
+### 3. `where referee_id != 2`
+
+* Ye filter lagata hai:
+
+  * Sirf un customers ko rakhna jinke `referee_id` ka value **2 nahi hai**.
+  * Agar kisi ko customer with `id = 2` ne refer kiya ho → usko hata do.
+
+---
+
+### 4. `OR referee_id IS NULL`
+
+* `OR` ka matlab hai: agar koi row **pehle condition fail** bhi kar de,
+  to dusri condition pass kare to bhi row result mein aayega.
+
+* `referee_id IS NULL` matlab:
+
+  * Agar referee\_id blank/unknown hai (kisi ne refer hi nahi kiya) → us row ko bhi include karo.
+
+---
+
+## 🔹 Simple Example
+
+Customer table:
+
+| id | name | referee\_id |
+| -- | ---- | ----------- |
+| 1  | Will | NULL        |
+| 2  | Jane | NULL        |
+| 3  | Alex | 2           |
+| 4  | Bill | 0           |
+| 5  | Zack | 1           |
+
+### Apply condition
+
+* Will → referee\_id = NULL → ✅ include (because `IS NULL`)
+* Jane → referee\_id = NULL → ✅ include
+* Alex → referee\_id = 2 → ❌ exclude
+* Bill → referee\_id = 0 (not 2) → ✅ include
+* Zack → referee\_id = 1 (not 2) → ✅ include
+
+### Final Result:
+
+```
+name
+-----
+Will
+Jane
+Bill
+Zack
+```
+
+---
+
+## 🔹 Easy Analogy (Real life)
+
+Soch lo tum coaching centre mein admission karwa rahe ho.
+
+* Agar kisi student ko **ID = 2 wale dost** ne laya (refer kiya) → usko **exclude kar do**.
+* Agar kisi ko **koi bhi nahi laya (referee\_id = NULL)** → usko allow kar do.
+* Agar kisi ko **kisi aur ne laya (referee\_id != 2)** → usko bhi allow kar do.
+
+👉 Result mein tumhare paas sirf woh students rahenge jo **2 number wale student ke through nahi aaye**.
+
+---
+
+
+Bhai ab tu chaahta hai kya mai tumhe **step by step flow diagram (rows filter hone ka process)** bana ke samjhau?
