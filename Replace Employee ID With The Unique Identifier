@@ -1,0 +1,132 @@
+
+## Problem 1378 – Replace Employee ID With The Unique Identifier
+
+### Tables:
+
+**1. Employees**
+
+```
+id | name
+-----------
+1  | Alice
+7  | Bob
+11 | Meir
+90 | Winston
+3  | Jonathan
+```
+
+**2. EmployeeUNI**
+
+```
+id | unique_id
+--------------
+3  | 1
+11 | 2
+90 | 3
+```
+
+### Goal:
+
+* Har employee ke `name` ke saath **uska unique\_id** dikhana hai.
+* Agar kisi employee ka `unique_id` nahi hai (EmployeeUNI table mein entry nahi hai), to **`NULL`** dikhana hai.
+
+Desired output:
+
+```
+unique_id | name
+----------|---------
+null      | Alice
+null      | Bob
+2         | Meir
+3         | Winston
+1         | Jonathan
+```
+
+---
+
+## SQL Query (Solution):
+
+```sql
+SELECT EmployeeUNI.unique_id, Employees.name
+FROM Employees
+LEFT JOIN EmployeeUNI
+  ON Employees.id = EmployeeUNI.id;
+```
+
+---
+
+## Beginner-Level Step-by-Step Breakdown
+
+### 1. `SELECT EmployeeUNI.unique_id, Employees.name`
+
+* **`Employees.name`** → Hum employees ke **naam** dikhayenge.
+* **`EmployeeUNI.unique_id`** → Agar employee ka unique ID present ho, to woh bhi dikhayenge. Nahin hai to `NULL`.
+
+### 2. `FROM Employees`
+
+* Hum base table ko **Employees** banate hain — kyunki **sabhi employees** dikhane hain, chahe unke unique ID ho ya na ho.
+
+### 3. `LEFT JOIN EmployeeUNI`
+
+* **LEFT JOIN** ka main kaam:
+
+  * Sab rows from **left table** (`Employees`) aayenge.
+  * Jo rows **matching condition** se **right table** (`EmployeeUNI`) mein milte hain, unka data bhi aayega.
+  * Agar **matching row right table mein nahi** milti, to right wale columns **NULL** ho jaate hain.
+* Isliye Alice aur Bob ke paas unique\_id nahi tha, to unke liye `unique_id` column `NULL` bana raha.
+
+### 4. `ON Employees.id = EmployeeUNI.id`
+
+* Ye condition batati hai **kaunse rows match karenge**:
+
+  * Employee ke `id` column ko `EmployeeUNI` ke `id` se match karna hai.
+  * Agar same hai → join; agar nahi → NULL in unique\_id.
+
+---
+
+## Visual/Real-Life Analogy
+
+Soch lo tumhare paas do lists:
+
+* **List A (Employees)**: Alice, Bob, Meir, Winston, Jonathan
+* **List B (Uni IDs)**: (3 → 1), (11 → 2), (90 → 3) — yani Meir, Jonathan, Winston ke unique IDs hain
+
+Tum sabko dikhana chahte ho:
+
+* Agar unique ID available hai → dikhana
+* Nahin hai → `NULL` dikhana
+
+`LEFT JOIN` bilkul waisa hi kaam karega—List A mein sab rakhna, aur List B se sirf jo match kare usko attach karna else NULL.
+
+---
+
+## Why LEFT JOIN Works
+
+* **Left table** = Employees → ensures **ALL employees** show up.
+* **Right table** = EmployeeUNI → jo employees ke paas unique\_id hai, unke unique\_id milte hain.
+* Jo employees ke paas unique\_id nahi hai → unke liye unique\_id column blank (NULL) ho jaata hai.
+
+Isliye Alice aur Bob bhi list mein aate hain (LEFT JOIN ensures), lekin unka `unique_id` NULL banta hai (because no match).
+
+---
+
+## Summary Table
+
+| Step                  | Purpose/Reason                                     |
+| --------------------- | -------------------------------------------------- |
+| SELECT columns        | Choose unique\_id + name to output                 |
+| FROM Employees        | Base is employees; we need all of them             |
+| LEFT JOIN EmployeeUNI | Attach unique\_id if available; else leave as NULL |
+| ON condition          | Match rows based on employee's id                  |
+
+---
+
+This query ensures:
+
+* **Every employee** appears in result.
+* **unique\_id** appears if exists, else **NULL**.
+* Easy, clean, and exactly as problem demands.
+  ([walkccc.me][1], [goodtecher.com][2])
+
+---
+
