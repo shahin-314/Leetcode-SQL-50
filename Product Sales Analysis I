@@ -1,0 +1,94 @@
+
+
+```sql
+SELECT Product.product_name, Sales.year, Sales.price
+FROM Product
+JOIN Sales
+ON Sales.product_id = Product.product_id;
+```
+
+---
+
+## 1. Pehle Question ko samajh:
+
+* **Table 1 → Product**
+
+  * Columns: `product_id`, `product_name`
+  * Yani har product ka ek unique id hai (product\_id), aur uska naam.
+
+* **Table 2 → Sales**
+
+  * Columns: `sale_id`, `product_id`, `year`, `price`
+  * Yani har sale record mein kis product ka sale hua, kis year mein aur kis price pe.
+
+👉 Hume output chahiye:
+`product_name`, `year`, `price`
+
+---
+
+## 2. JOIN kya hota hai?
+
+Soch ek example:
+
+* **Product Table**:
+  \| product\_id | product\_name |
+  \|------------|--------------|
+  \| 1          | Apple        |
+  \| 2          | Orange       |
+
+* **Sales Table**:
+  \| sale\_id | product\_id | year | price |
+  \|---------|------------|------|-------|
+  \| 101     | 1          | 2019 | 100   |
+  \| 102     | 2          | 2020 | 200   |
+  \| 103     | 1          | 2021 | 120   |
+
+⚡ Problem:
+`Sales` table mein sirf **product\_id** hai, but naam (Apple/Orange) nahi hai.
+Naam to `Product` table mein hai.
+Isliye hume **dono tables ko jodna padega**.
+
+---
+
+## 3. Inner Join (JOIN = INNER JOIN by default)
+
+* INNER JOIN ka matlab:
+  → Sirf wo rows jisme `Product.product_id` aur `Sales.product_id` match karte hai, unhi ko output mein lo.
+
+SQL likhne ka tareeka:
+
+```sql
+FROM Product
+JOIN Sales
+ON Sales.product_id = Product.product_id
+```
+
+Yani `Product` aur `Sales` dono ke product\_id ka milan karwao → matching row lao.
+
+---
+
+## 4. SELECT kya le rahe hain?
+
+```sql
+SELECT Product.product_name, Sales.year, Sales.price
+```
+
+* `Product.product_name` → product ka naam (Apple, Orange, …)
+* `Sales.year` → kis saal sale hua
+* `Sales.price` → kis price pe sale hua
+
+---
+
+## 5. Final Output (upar ke data pe)
+
+| product\_name | year | price |
+| ------------- | ---- | ----- |
+| Apple         | 2019 | 100   |
+| Orange        | 2020 | 200   |
+| Apple         | 2021 | 120   |
+
+⚡ Dekh le → ab hume product ka naam mil gaya (sirf Sales table se possible nahi tha).
+
+---
+
+m aayega baad mein)
