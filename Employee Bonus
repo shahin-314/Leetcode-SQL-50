@@ -1,0 +1,101 @@
+
+
+### Code:
+
+```sql
+SELECT e.name, b.bonus
+FROM Employee e
+LEFT JOIN Bonus b
+  ON e.empId = b.empId
+WHERE b.bonus < 1000 OR b.bonus IS NULL;
+```
+
+---
+
+### 1. Tables ka relation:
+
+* **Employee (e)**
+  `empId, name, salary, department` … (assume kar lo)
+
+* **Bonus (b)**
+  `empId, bonus` … (employee ka bonus rakha hai)
+
+👉 Har employee ka bonus entry **hamesha ho bhi sakta hai, aur nahi bhi ho sakta**.
+
+---
+
+### 2. Line by line explanation:
+
+1. **`SELECT e.name, b.bonus`**
+   – Hume **employee ka naam aur uska bonus** chahiye.
+   – Lekin sabhi employees ke liye bonus table me record nahi hoga.
+
+---
+
+2. **`FROM Employee e`**
+   – Employee table ko base banaya (yahi master list hai).
+
+---
+
+3. **`LEFT JOIN Bonus b ON e.empId = b.empId`**
+   – Matlab:
+
+   * Har employee ko Bonus table se match karo `empId` ke basis pe.
+   * Agar employee ka bonus entry milta hai → join ho jaayega.
+   * Agar nahi milta → employee aayega, lekin bonus column `NULL` hoga.
+
+   🔑 **Yehi reason hai ki LEFT JOIN use kiya**.
+   Agar tum `INNER JOIN` use karte, toh jinke paas bonus record hi nahi hai wo employees result me nahi aate.
+   Lekin hume unko bhi dikhana hai (bonus = NULL ke sath).
+
+---
+
+4. **`WHERE b.bonus < 1000 OR b.bonus IS NULL`**
+   – Matlab 2 condition check ho rahi hai:
+
+   1. Bonus diya gaya hai, par 1000 se kam hai.
+   2. Bonus diya hi nahi gaya (NULL hai).
+
+   → Iska matlab:
+
+   * Employee ke paas **chhota bonus (<1000)** ho ya
+   * **koi bonus entry hi na ho**, dono cases me employee ko list karna hai.
+
+---
+
+### 3. Ab "kyu LEFT JOIN hi use kiya?"
+
+* **INNER JOIN**: sirf unhi employees ko dikhata jinke paas bonus record hai.
+  → Jinke paas bonus hi nahi, wo **miss ho jaate**.
+
+* **RIGHT JOIN**: ye Bonus table ko master banata. Matlab sirf unhi employees aayenge jo Bonus table me present hain.
+  → Jinke paas bonus nahi hai, wo **bilkul nahi aayenge** (lekin hume chahiye the).
+
+* **FULL OUTER JOIN**: dono taraf se records lekar NULL fill karega, lekin yaha hume bas Employee list me se missing bonus wale chahiye, na ki extra orphan bonus records.
+
+👉 Isliye **LEFT JOIN hi perfect choice hai**, kyunki Employee base hai aur uske bonus ka record ho ya na ho, dono chahiye.
+
+---
+
+### 4. Ambiguous ka context:
+
+Jab tum ek hi table ko multiple times join karte ho (`Employee e` aur `Bonus b`), tab SQL confuse ho sakta hai ki column kahan se aana chahiye (agar tum direct `empId` likh do bina alias ke).
+Isliye hum alias (`e.empId`, `b.empId`) use karte hain.
+
+---
+
+### Example output:
+
+| name  | bonus |                       |
+| ----- | ----- | --------------------- |
+| Aditi | 500   | ✅ bonus < 1000        |
+| Rahul | NULL  | ✅ no bonus record     |
+| Meena | 2000  | ❌ skip (bonus > 1000) |
+
+---
+
+👉 Toh LEFT JOIN hi allow karta hai ki **Employee master table ke records lose na ho**, chahe Bonus record ho ya nahi.
+
+---
+
+Bhai, kya tu chaahta hai mai abhi is query ka **visual diagram (Venn diagram style)** bana kar samjhau joins ke difference?
