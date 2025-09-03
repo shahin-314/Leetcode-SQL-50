@@ -1,0 +1,151 @@
+
+
+# Problem (simple words me)
+
+Hume **Cinema** table se sirf wahi movies chahiye:
+
+1. jinki **id odd** (1, 3, 5, …) ho
+2. jinka **description "boring" na ho**
+3. aur result **rating ke descending (high → low)** order me chahiye
+
+---
+
+# Query
+
+```sql
+SELECT *
+FROM Cinema
+WHERE id % 2 = 1          -- odd IDs
+  AND description <> 'boring'   -- description boring na ho
+ORDER BY rating DESC;     -- rating descending order
+```
+
+---
+
+## Line-by-line Explanation
+
+### 1) `SELECT *`
+
+* `*` ka matlab: **saare columns** le aao (id, movie, description, rating).
+* Chaaho to columns ko naam se bhi likh sakte ho:
+  `SELECT id, movie, description, rating`
+
+---
+
+### 2) `FROM Cinema`
+
+* Data **Cinema** table se aa raha hai.
+
+---
+
+### 3) `WHERE id % 2 = 1`
+
+* `WHERE` = rows ko **filter** karta hai (kaun si rows rakhni/hatani).
+* `id % 2 = 1` → `%` (modulo) operator: id ko 2 se divide karke **remainder** 1 ho to **odd**.
+
+  * Example:
+
+    * `1 % 2 = 1` ✅ (odd)
+    * `2 % 2 = 0` ❌ (even)
+    * `3 % 2 = 1` ✅
+    * `4 % 2 = 0` ❌
+
+**Alt syntax:** `MOD(id, 2) = 1` (same cheez)
+
+---
+
+### 4) `AND description <> 'boring'`
+
+* `AND` = pehle wali condition **true** ho aur ye wali bhi **true** ho.
+* `<>` = **not equal** (MySQL me `!=` bhi chal jata hai).
+* Matlab: description **exactly 'boring'** na ho.
+
+  * `"boring"` → ❌ (exclude)
+  * `"Boring"` / `"Interesting"` → ✅ (include)
+
+> Note: MySQL me collation par depend karta hai ki comparison case-sensitive hai ya nahi. LeetCode ke context me tum `"boring"` ko exact string hi samjho.
+
+**Edge case:** agar description `NULL` ho to `description <> 'boring'` ka result `UNKNOWN` hota hai → row **include nahi** hoti. Agar tum **NULL wali rows bhi rakhna** chahte, to likhte:
+`(description <> 'boring' OR description IS NULL)`
+
+---
+
+### 5) `ORDER BY rating DESC`
+
+* Result ko **rating ke hisaab se** sort karo.
+* `DESC` = **descending** (sabse bada pehle).
+* Agar do movies ki rating same ho, to unka order unspecified hai (tie-breaker nahi diya). Chaho to secondary sort add kar sakte:
+  `ORDER BY rating DESC, id ASC`
+
+---
+
+## Dry Run (step-by-step with values)
+
+### Input (example):
+
+| id | movie      | description | rating |
+| -- | ---------- | ----------- | ------ |
+| 1  | War        | great 3D    | 8.9    |
+| 2  | Science    | fiction     | 8.5    |
+| 3  | irish      | boring      | 6.2    |
+| 4  | Ice song   | Fantacy     | 8.6    |
+| 5  | House card | Interesting | 9.1    |
+
+### Step A — `WHERE id % 2 = 1` (odd ids rakho)
+
+bache: **id = 1, 3, 5**
+
+| id | movie      | description | rating |
+| -- | ---------- | ----------- | ------ |
+| 1  | War        | great 3D    | 8.9    |
+| 3  | irish      | boring      | 6.2    |
+| 5  | House card | Interesting | 9.1    |
+
+### Step B — `AND description <> 'boring'` (boring hatao)
+
+* id 3 ki description `"boring"` hai → **remove**
+* bache: id 1, id 5
+
+| id | movie      | description | rating |
+| -- | ---------- | ----------- | ------ |
+| 1  | War        | great 3D    | 8.9    |
+| 5  | House card | Interesting | 9.1    |
+
+### Step C — `ORDER BY rating DESC` (high → low)
+
+* 9.1 pehle, 8.9 baad me
+
+| id | movie      | description | rating |
+| -- | ---------- | ----------- | ------ |
+| 5  | House card | Interesting | 9.1    |
+| 1  | War        | great 3D    | 8.9    |
+
+✅ Yehi final output hai.
+
+---
+
+## Chhote Tips / FAQs
+
+* **`<>` vs `!=`**: Dono **not equal** ke liye chalti hain. SQL standard me `<>` prefer ki jati hai.
+* **`%` vs `MOD()`**: Dono same—`id % 2 = 1` ya `MOD(id, 2) = 1`.
+* **Comments**:
+
+  * `-- comment` (single line; MySQL me `--` ke baad space hona chahiye in some clients)
+  * `/* comment */` (block)
+* **`SELECT *`**: Start me theek hai, lekin production me **specific columns** select karna better hota hai (performance + clarity).
+
+---
+
+## Alternative (columns explicitly & tie-breaker ke saath)
+
+```sql
+SELECT id, movie, description, rating
+FROM Cinema
+WHERE MOD(id, 2) = 1
+  AND description <> 'boring'
+ORDER BY rating DESC, id ASC;
+```
+
+---
+
+agar chaho to mai ek **visual filter flow** (diagram arrows ke sath) bhi bana sakta hu jisme dikhau: full table → odd filter → boring remove → sort.
