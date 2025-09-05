@@ -1,0 +1,213 @@
+
+
+# 🧠 Problem ko simple words me
+
+* **Prices**: har product ki price **date range** (start\_date → end\_date) ke beech kya thi.
+* **UnitsSold**: kis date par us product ke **kitne units** beche gaye.
+
+Hume **har product** ka **average selling price** chahiye:
+
+$$
+\text{Average Price} = \frac{\sum (\text{price} \times \text{units})}{\sum (\text{units})}
+$$
+
+* Agar product ke **koi units beche hi nahi gaye**, to uska average **0** hoga.
+* Result ko **2 decimal places** tak round karna hai.
+
+---
+
+# ✅ Tumhari Query
+
+```sql
+SELECT 
+    p.product_id,
+    ROUND( IFNULL(SUM(p.price * u.units) / SUM(u.units), 0), 2 ) AS average_price
+FROM Prices p
+LEFT JOIN UnitsSold u
+  ON p.product_id = u.product_id
+ AND u.purchase_date BETWEEN p.start_date AND p.end_date
+GROUP BY p.product_id;
+```
+
+---
+
+## 🔍 Line-by-Line Explanation
+
+### `FROM Prices p`
+
+* Hum **Prices** ko base table le rahe hain (alias `p`).
+* Kyun? Kyunki hume **har product** ka answer chahiye, bhale hi uske sales na hue ho.
+  (Agar sales na hue ho, to bhi product Prices me to hoga—uska answer 0 hona chahiye.)
+
+---
+
+### `LEFT JOIN UnitsSold u`
+
+* **LEFT JOIN** ka matlab: Prices ki side (left) ke **saare rows** aayenge.
+* UnitsSold (alias `u`) se **match milta hai to theek**, warna `u` ke columns **NULL** ho jayenge.
+* Isse woh products bhi result me aayenge jinke **koi sales** nahi hue.
+
+---
+
+### `ON p.product_id = u.product_id`
+
+* Same product ke rows ko jodna.
+
+---
+
+### `AND u.purchase_date BETWEEN p.start_date AND p.end_date`
+
+* Important! Ek sale sirf usi price period se match hogi **jisme woh date aati ho**.
+* `BETWEEN` **inclusive** hota hai (start\_date aur end\_date dono include).
+
+> Example:
+> Price period: 2019-03-01 → 2019-03-22
+> Sale date: 2019-03-01 ✅ (match)
+> Sale date: 2019-03-22 ✅ (match)
+> Sale date: 2019-02-28 ❌ (no match)
+
+---
+
+### `SELECT p.product_id, ...`
+
+* Har product ke liye final average nikalna hai.
+
+---
+
+### `SUM(p.price * u.units)`
+
+* Har matched sale ka **revenue** (price × units).
+* Same product ke sab matched rows add ho jayenge.
+* Agar koi sale match hi nahi hui, to ye **NULL** hoga (LEFT JOIN ki wajah se).
+
+---
+
+### `SUM(u.units)`
+
+* Total beche gaye units (sirf matched rows par).
+* Agar sales nahi hui, to ye bhi **NULL** hoga.
+
+---
+
+### `SUM(p.price * u.units) / SUM(u.units)`
+
+* Ye hi **weighted average** formula hai.
+
+---
+
+### `IFNULL( ... , 0 )`
+
+* Agar product ke sales nahi hue → dono SUMs NULL → division ka result NULL.
+* `IFNULL(..., 0)` se us case me **0** set kar diya.
+
+---
+
+### `ROUND(..., 2)`
+
+* 2 decimal places tak round (jaise 6.9565 → 6.96).
+
+---
+
+### `GROUP BY p.product_id`
+
+* Har product ke liye ek row chahiye → aggregation ke liye group by.
+
+---
+
+# 🧪 Dry Run (sample data par)
+
+**Prices**
+
+| product\_id | start\_date | end\_date  | price |
+| ----------- | ----------- | ---------- | ----- |
+| 1           | 2019-02-17  | 2019-02-28 | 5     |
+| 1           | 2019-03-01  | 2019-03-22 | 20    |
+| 2           | 2019-02-01  | 2019-02-20 | 15    |
+| 2           | 2019-02-21  | 2019-03-31 | 30    |
+
+**UnitsSold**
+
+| product\_id | purchase\_date | units |
+| ----------- | -------------- | ----- |
+| 1           | 2019-02-25     | 100   |
+| 1           | 2019-03-01     | 15    |
+| 2           | 2019-02-10     | 200   |
+| 2           | 2019-03-22     | 30    |
+
+---
+
+### 🔗 Join Matching (price period ke hisaab se)
+
+**Product 1**
+
+* Sale: 2019-02-25 (100 units) → matches price **5** (period: 02-17 → 02-28)
+  Revenue = 100 × 5 = **500**
+* Sale: 2019-03-01 (15 units) → matches price **20** (period: 03-01 → 03-22)
+  Revenue = 15 × 20 = **300**
+
+Totals (p1):
+
+* Total Revenue = 500 + 300 = **800**
+* Total Units = 100 + 15 = **115**
+* Average = 800 / 115 = **6.9565 → 6.96**
+
+**Product 2**
+
+* Sale: 2019-02-10 (200 units) → matches price **15** (period: 02-01 → 02-20)
+  Revenue = 200 × 15 = **3000**
+* Sale: 2019-03-22 (30 units) → matches price **30** (period: 02-21 → 03-31)
+  Revenue = 30 × 30 = **900**
+
+Totals (p2):
+
+* Total Revenue = 3000 + 900 = **3900**
+* Total Units = 200 + 30 = **230**
+* Average = 3900 / 230 = **16.9565 → 16.96**
+
+**Output**
+
+| product\_id | average\_price |
+| ----------- | -------------- |
+| 1           | 6.96           |
+| 2           | 16.96          |
+
+---
+
+## 💡 Common Doubts (Quick FAQs)
+
+* **INNER JOIN kyu nahi?**
+  INNER JOIN me jin products ki koi sale hi nahi, wo **gaya** (missing). Hame har product chahiye, isliye **LEFT JOIN**.
+
+* **BETWEEN inclusive hai?**
+  Haan, start & end dono include hote hain.
+
+* **Agar UnitsSold me duplicate rows ho?**
+  Koi problem nahi—`SUM` sabko add kar dega (problem statement ne bola bhi hai “may contain duplicates”).
+
+* **Division me integer issue?**
+  MySQL me `/` decimal result de deta hai (specially jab numerator/denominator aggregate hain). Phir `ROUND(..., 2)` final format de deta hai.
+
+---
+
+## 🧾 Optional: Thoda aur “safe” version (agar strict NULL handling chaho)
+
+Kabhi-kabhi tum chaho to denominator zero/NULL hone par divide na ho, to:
+
+```sql
+SELECT 
+    p.product_id,
+    ROUND(
+      IFNULL(SUM(p.price * u.units) / NULLIF(SUM(u.units), 0), 0)
+    , 2) AS average_price
+FROM Prices p
+LEFT JOIN UnitsSold u
+  ON p.product_id = u.product_id
+ AND u.purchase_date BETWEEN p.start_date AND p.end_date
+GROUP BY p.product_id;
+```
+
+`NULLIF(SUM(u.units), 0)` → agar total units 0/NULL ho to NULL dega; fir `IFNULL(..., 0)` se safe 0 aayega.
+
+---
+
+agar chaaho to mai is logic ka **timeline diagram** bhi bana du (price periods ke neeche sales-date pins laga kar), taaki mapping aur visual ho jaaye.
