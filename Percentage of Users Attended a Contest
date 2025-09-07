@@ -1,0 +1,148 @@
+
+
+## 📝 Problem ko samjho
+
+* **Users table** → sabhi users ke IDs aur names rakhta hai.
+* **Register table** → kaunsa user kis contest me registered hai, ye batata hai.
+
+👉 Hume **har contest ka percentage** nikalna hai:
+
+```
+percentage = (number of unique users in that contest / total users) * 100
+```
+
+* Fir us percentage ko **2 decimal places tak round** karna hai.
+* Aur result ko order karna hai:
+
+  1. **percentage DESC** (highest pehle),
+  2. Tie ho to **contest\_id ASC**.
+
+---
+
+## 📝 SQL Query
+
+```sql
+SELECT 
+    r.contest_id,
+    ROUND(COUNT(DISTINCT r.user_id) * 100.0 / (SELECT COUNT(*) FROM Users), 2) AS percentage
+FROM Register r
+GROUP BY r.contest_id
+ORDER BY percentage DESC, contest_id ASC;
+```
+
+---
+
+## 🔹 Step by Step Dry Run with Example
+
+### Input:
+
+**Users table**
+
+```
+user_id | user_name
+--------+----------
+6       | Alice
+2       | Bob
+7       | Alex
+```
+
+👉 Total Users = **3**
+
+**Register table**
+
+```
+contest_id | user_id
+-----------+---------
+215        | 6
+209        | 2
+208        | 2
+210        | 6
+208        | 6
+209        | 7
+209        | 6
+215        | 7
+208        | 7
+210        | 2
+207        | 2
+210        | 7
+```
+
+---
+
+### Step 1: `GROUP BY contest_id`
+
+Contest-wise group ban jaayenge.
+
+**Contest 208**
+
+```
+Users = [2, 6, 7] → 3 unique users
+```
+
+**Contest 209**
+
+```
+Users = [2, 7, 6] → 3 unique users
+```
+
+**Contest 210**
+
+```
+Users = [6, 2, 7] → 3 unique users
+```
+
+**Contest 215**
+
+```
+Users = [6, 7] → 2 unique users
+```
+
+**Contest 207**
+
+```
+Users = [2] → 1 unique user
+```
+
+---
+
+### Step 2: Formula Apply karo
+
+`COUNT(DISTINCT user_id) * 100 / total_users`
+
+* Contest 208 → (3 / 3) \* 100 = **100.00**
+* Contest 209 → (3 / 3) \* 100 = **100.00**
+* Contest 210 → (3 / 3) \* 100 = **100.00**
+* Contest 215 → (2 / 3) \* 100 = **66.67**
+* Contest 207 → (1 / 3) \* 100 = **33.33**
+
+---
+
+### Step 3: Sorting
+
+1. Highest percentage first
+2. Tie hone par contest\_id ascending
+
+Final Output:
+
+```
+contest_id | percentage
+-----------+------------
+208        | 100.00
+209        | 100.00
+210        | 100.00
+215        | 66.67
+207        | 33.33
+```
+
+---
+
+✅ **So query ka main kaam ye hai:**
+
+1. Count karo har contest me unique users.
+2. Divide by total users.
+3. Percentage nikalo aur round karo.
+4. Sort karo rule ke hisaab se.
+
+---
+
+👉 Bhai, kya tu chahta hai mai isko ek **diagram style** (circle me users aur contests connect karke) bana kar explain karu jisme percentage clearly dikhe?
