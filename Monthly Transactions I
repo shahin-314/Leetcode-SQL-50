@@ -1,0 +1,112 @@
+
+## 🔹 Problem Breakdown
+
+Table: **Transactions**
+Columns:
+
+* `id` → unique transaction id
+* `country` → kis country me transaction hua
+* `state` → "approved" ya "declined"
+* `amount` → transaction ka amount
+* `trans_date` → kis date pe hua
+
+---
+
+## 🔹 Jo Output me chahiye
+
+Har **month + country** ke liye:
+
+1. **trans\_count** → total transactions count
+2. **approved\_count** → sirf approved transactions count
+3. **trans\_total\_amount** → total amount of all transactions
+4. **approved\_total\_amount** → sirf approved transactions ka total
+
+Aur `month` ko format karna hai `YYYY-MM` ke form me.
+
+---
+
+## 🔹 SQL Query
+
+```sql
+SELECT 
+    DATE_FORMAT(trans_date, '%Y-%m') AS month,
+    country,
+    COUNT(*) AS trans_count,
+    SUM(CASE WHEN state = 'approved' THEN 1 ELSE 0 END) AS approved_count,
+    SUM(amount) AS trans_total_amount,
+    SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) AS approved_total_amount
+FROM Transactions
+GROUP BY month, country;
+```
+
+---
+
+## 🔹 Query Explanation
+
+1. **`DATE_FORMAT(trans_date, '%Y-%m')`**
+
+   * Date ko `YYYY-MM` month format me convert karne ke liye.
+   * Example: `2018-12-18` → `2018-12`
+
+2. **`COUNT(*)`**
+
+   * Total transactions count karne ke liye.
+
+3. **`SUM(CASE WHEN state = 'approved' THEN 1 ELSE 0 END)`**
+
+   * Approved transactions count karta hai.
+   * Agar `state = 'approved'` hai → 1 add karega, warna 0.
+
+4. **`SUM(amount)`**
+
+   * Sabhi transactions ka total amount.
+
+5. **`SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END)`**
+
+   * Sirf approved transactions ka total amount.
+
+6. **`GROUP BY month, country`**
+
+   * Har month aur country ke combination ke liye alag-alag result.
+
+---
+
+## 🔹 Example Dry Run
+
+Input:
+
+```
+| id  | country | state    | amount | trans_date  |
+|-----|---------|----------|--------|-------------|
+| 121 | US      | approved | 1000   | 2018-12-18  |
+| 122 | US      | declined | 2000   | 2018-12-19  |
+| 123 | US      | approved | 2000   | 2019-01-01  |
+| 124 | DE      | approved | 2000   | 2019-01-07  |
+```
+
+👉 Grouping by `2018-12, US`:
+
+* trans\_count = 2 (id 121,122)
+* approved\_count = 1 (id 121)
+* trans\_total\_amount = 3000
+* approved\_total\_amount = 1000
+
+👉 Grouping by `2019-01, US`:
+
+* trans\_count = 1 (id 123)
+* approved\_count = 1
+* trans\_total\_amount = 2000
+* approved\_total\_amount = 2000
+
+👉 Grouping by `2019-01, DE`:
+
+* trans\_count = 1 (id 124)
+* approved\_count = 1
+* trans\_total\_amount = 2000
+* approved\_total\_amount = 2000
+
+✅ Output matches exactly.
+
+---
+
+Bhai, ab tu chaahe to mai isko **step-by-step aggregation table** ke form me bhi bana kar dikha sakta hoon (intermediate result ke sath). Kya mai wo bana du?
