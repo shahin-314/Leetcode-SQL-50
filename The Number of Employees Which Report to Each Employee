@@ -1,0 +1,112 @@
+
+### 🧠 **Question Understanding**
+
+We are given a table named **Employees**, with 4 columns:
+
+| employee_id | name | reports_to | age |
+| ----------- | ---- | ---------- | --- |
+
+✅ Each employee can have a manager (that’s what `reports_to` means).
+✅ If `reports_to` is `NULL`, that employee has **no manager** (they’re top-level).
+✅ Some employees (like managers) have others reporting to them.
+
+We must find:
+
+1. Every **manager** (anyone who has at least one person reporting to them),
+2. The **number of employees** reporting to them,
+3. The **average age** of those reporting employees (rounded to nearest integer).
+
+---
+
+### 🧩 **Example**
+
+| employee_id | name    | reports_to | age |
+| ----------- | ------- | ---------- | --- |
+| 9           | Hercy   | NULL       | 43  |
+| 6           | Alice   | 9          | 41  |
+| 4           | Bob     | 9          | 36  |
+| 2           | Winston | NULL       | 37  |
+
+From the table:
+
+* Alice → reports to Hercy
+* Bob → reports to Hercy
+* Winston → no manager
+
+So:
+
+* Hercy is a **manager** (2 reports)
+* Average age of Alice and Bob → (41 + 36) / 2 = 38.5 → rounded = **39**
+
+✅ Final output:
+
+| employee_id | name  | reports_count | average_age |
+| ----------- | ----- | ------------- | ----------- |
+| 9           | Hercy | 2             | 39          |
+
+---
+
+### 🧮 **Approach**
+
+We’ll need to:
+
+1. **Join the table to itself**
+   (one side as manager, the other as employee)
+2. **Group by manager**
+3. **Count reports** and **average their age**
+
+---
+
+### 💻 **SQL Code**
+
+```sql
+SELECT 
+    m.employee_id,                        -- manager's id
+    m.name,                               -- manager's name
+    COUNT(e.employee_id) AS reports_count, -- number of employees reporting to manager
+    ROUND(AVG(e.age)) AS average_age       -- average age of reports (rounded)
+FROM Employees e
+JOIN Employees m
+  ON e.reports_to = m.employee_id          -- link employee to their manager
+GROUP BY m.employee_id, m.name             -- one row per manager
+ORDER BY m.employee_id;
+```
+
+---
+
+### 🧩 **Step-by-Step Explanation**
+
+| Step | What happens                                                        | Example                                                                                       |
+| ---- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1️⃣  | `JOIN Employees e JOIN Employees m ON e.reports_to = m.employee_id` | Each employee (e) is matched with their manager (m). Example: Alice (e) joins with Hercy (m). |
+| 2️⃣  | `GROUP BY m.employee_id, m.name`                                    | Group all employees under the same manager.                                                   |
+| 3️⃣  | `COUNT(e.employee_id)`                                              | Counts how many people report to that manager.                                                |
+| 4️⃣  | `AVG(e.age)`                                                        | Finds the average age of those reporting employees.                                           |
+| 5️⃣  | `ROUND()`                                                           | Rounds the average to nearest whole number.                                                   |
+| 6️⃣  | `ORDER BY m.employee_id`                                            | Sort results by manager’s ID.                                                                 |
+
+---
+
+### 💡 **Final Output (for example 1)**
+
+| employee_id | name  | reports_count | average_age |
+| ----------- | ----- | ------------- | ----------- |
+| 9           | Hercy | 2             | 39          |
+
+---
+
+### 🔍 Summary
+
+| Keyword                           | Meaning                                                    |
+| --------------------------------- | ---------------------------------------------------------- |
+| `JOIN`                            | Combine table with itself to match employees with managers |
+| `ON e.reports_to = m.employee_id` | Link each employee to their manager                        |
+| `COUNT()`                         | Count employees under each manager                         |
+| `AVG()`                           | Find average age                                           |
+| `ROUND()`                         | Round average to nearest integer                           |
+| `GROUP BY`                        | Group by manager’s ID and name                             |
+| `ORDER BY`                        | Sort results                                               |
+
+---
+
+Would you like me to show how the table looks *after the self-join step* (so you can visualize how employees and managers connect)?
