@@ -1,0 +1,110 @@
+
+
+## 🧠 Understanding the Question
+
+We are given a table called `Triangle`:
+
+| x  | y  | z  |
+| -- | -- | -- |
+| 13 | 15 | 30 |
+| 10 | 20 | 15 |
+
+Each row represents **3 sides of a possible triangle**.
+
+We need to **check if these 3 sides can form a valid triangle**.
+
+---
+
+## 🔺 Rule of Triangle
+
+For **any 3 sides (a, b, c)** to form a **triangle**,
+**the sum of any two sides must be greater than the third side.**
+
+That means 👇
+
+```
+a + b > c
+b + c > a
+c + a > b
+```
+
+If all three are true → ✅ "Yes"
+If any one fails → ❌ "No"
+
+---
+
+## 💡 Example
+
+### 1️⃣ Row 1 → (13, 15, 30)
+
+* 13 + 15 = 28 → not greater than 30 ❌
+  👉 So, cannot form a triangle → **No**
+
+### 2️⃣ Row 2 → (10, 20, 15)
+
+* 10 + 20 = 30 > 15 ✅
+* 10 + 15 = 25 > 20 ✅
+* 20 + 15 = 35 > 10 ✅
+  👉 All conditions true → **Yes**
+
+---
+
+## ✅ Output
+
+| x  | y  | z  | triangle |
+| -- | -- | -- | -------- |
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
+
+---
+
+## 💻 SQL Solution
+
+Here’s the full query 👇
+
+```sql
+SELECT 
+    x, 
+    y, 
+    z,
+    CASE
+        WHEN x + y > z AND y + z > x AND z + x > y THEN 'Yes'
+        ELSE 'No'
+    END AS triangle
+FROM Triangle;
+```
+
+---
+
+## 🧾 Step-by-Step Explanation
+
+| Step | SQL Part                                                | Meaning                                            |
+| ---- | ------------------------------------------------------- | -------------------------------------------------- |
+| 1    | `SELECT x, y, z`                                        | Selects the side lengths                           |
+| 2    | `CASE ... END`                                          | Used for conditional logic (like “if-else” in SQL) |
+| 3    | `WHEN x + y > z AND y + z > x AND z + x > y THEN 'Yes'` | If all triangle conditions are true → Yes          |
+| 4    | `ELSE 'No'`                                             | If any condition fails → No                        |
+| 5    | `FROM Triangle`                                         | Tells SQL to take data from the Triangle table     |
+
+---
+
+## 🧩 Final Output (as per example)
+
+| x  | y  | z  | triangle |
+| -- | -- | -- | -------- |
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
+
+---
+
+## 💬 Summary
+
+✅ **Triangle Rule:**
+Sum of any two sides > third side.
+
+✅ **SQL Keywords Used:**
+
+* `CASE` → for conditional logic
+* `AND` → to check multiple conditions together
+* `ELSE` → fallback result
+
