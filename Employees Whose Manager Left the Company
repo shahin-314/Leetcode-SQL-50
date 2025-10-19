@@ -1,0 +1,121 @@
+
+## 🧠 Problem Understanding
+
+We are given a table named `Employees`:
+
+| employee_id | name      | manager_id | salary |
+| ----------- | --------- | ---------- | ------ |
+| 3           | Mila      | 9          | 60301  |
+| 12          | Antonella | NULL       | 31000  |
+| 13          | Emery     | NULL       | 67084  |
+| 1           | Kalel     | 11         | 21241  |
+| 9           | Mikaela   | NULL       | 50937  |
+| 11          | Joziah    | 6          | 28485  |
+
+We need to find employees:
+
+1. whose **salary < 30000**
+2. **and** whose **manager left the company**
+
+---
+
+## 💡 Key Observation
+
+👉 If a manager left the company,
+their **`employee_id` will not exist** anymore in the `Employees` table.
+But their **manager_id** will still remain in other employees’ records.
+
+So basically:
+
+* The employee’s `manager_id` is **not null**
+* That `manager_id` does **not exist** in the list of current `employee_id`s.
+
+---
+
+## ✅ Step-by-Step Solution
+
+### Step 1: Check all employees with salary < 30000
+
+```sql
+SELECT *
+FROM Employees
+WHERE salary < 30000;
+```
+
+🧾 Output from example:
+
+| employee_id | name   | manager_id | salary |
+| ----------- | ------ | ---------- | ------ |
+| 1           | Kalel  | 11         | 21241  |
+| 11          | Joziah | 6          | 28485  |
+
+So these are two possible candidates.
+
+---
+
+### Step 2: Check if their **manager_id exists** in the Employees table.
+
+We can do this using a **LEFT JOIN** on the same table (self join).
+
+```sql
+SELECT e.employee_id
+FROM Employees e
+LEFT JOIN Employees m
+ON e.manager_id = m.employee_id
+WHERE e.salary < 30000
+  AND e.manager_id IS NOT NULL
+  AND m.employee_id IS NULL;
+```
+
+---
+
+## 🔍 Explanation of Each Line
+
+| Line                              | Meaning                                                                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `FROM Employees e`                | This is our main employee table.                                                           |
+| `LEFT JOIN Employees m`           | We join the same table again but treat it as the “manager” table.                          |
+| `ON e.manager_id = m.employee_id` | Connect each employee to their manager by matching manager ID.                             |
+| `WHERE e.salary < 30000`          | Only look at employees with salary less than 30000.                                        |
+| `AND e.manager_id IS NOT NULL`    | Ignore employees who don’t have a manager.                                                 |
+| `AND m.employee_id IS NULL`       | This means — there is **no manager record found**, i.e., the manager **left the company**. |
+
+---
+
+## 🧾 Dry Run on Example
+
+Let’s check one by one:
+
+| employee_id | manager_id | salary | Does manager exist? | Keep it? |
+| ----------- | ---------- | ------ | ------------------- | -------- |
+| 1           | 11         | 21241  | Yes (Joziah exists) | ❌ No     |
+| 11          | 6          | 28485  | No (6 not in table) | ✅ Yes    |
+
+✅ So only **employee_id = 11** should appear.
+
+---
+
+## ✅ Final SQL Query
+
+```sql
+SELECT e.employee_id
+FROM Employees e
+LEFT JOIN Employees m
+ON e.manager_id = m.employee_id
+WHERE e.salary < 30000
+  AND e.manager_id IS NOT NULL
+  AND m.employee_id IS NULL
+ORDER BY e.employee_id;
+```
+
+---
+
+## 🏁 Final Output
+
+| employee_id |
+| ----------- |
+| 11          |
+
+---
+
+Would you like me to show this using a **visual join diagram** (how employee 11 joins with NULL manager) to understand `LEFT JOIN` and `m.employee_id IS NULL` more clearly?
